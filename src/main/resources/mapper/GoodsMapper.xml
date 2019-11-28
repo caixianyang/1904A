@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+		"-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fh.mapper.GoodsMapper">
+	<cache  eviction="LRU" flushInterval="6000" size="512" readOnly="true"/>
+    <resultMap id="mm" type="map">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+	<sql id="TableName">
+		ssm_goods
+	</sql>
+
+    <sql id="sql_where">
+        <where>
+            <if test="productName != '' and productName != null">
+                and g.name like concat('%',#{productName},'%')
+            </if>
+            <if test="minTime!=null">
+                and g.time &gt;=#{minTime}
+            </if>
+            <if test="maxTime!=null">
+                and g.time &lt;=#{maxTime}
+            </if>
+            <if test="minPrice!=null">
+                and g.price &gt;=#{minPrice}
+            </if>
+            <if test="maxPrice!=null">
+                and g.price &lt;=#{maxPrice}
+            </if>
+            <if test="brandId != null and brandId != 0">
+                and g.brand_id = #{brandId}
+            </if>
+        </where>
+    </sql>
+
+
+
+	<!-- 数据查询 -->
+	<select id="queryGoodsList"  parameterType="java.util.Map" resultType="com.fh.model.Goods">
+		select g.*,b.name "brand.name" from <include refid="TableName"></include> g
+		left join goods_brand b on g.brand_id = b.id
+        <include refid="sql_where"></include>
+		LIMIT #{start},#{length}
+	</select>
+
+	<select id="queryBrandList" resultType="brand" >
+		SELECT * from goods_brand
+	</select>
+
+    <select id="getBranByName" resultType="int" parameterType="string">
+		SELECT id from goods_brand name =#{brandName}
+	</select>
+
+    <insert id="addBrand" parameterType="brand" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into goods_brand (name) values (#{name})
+    </insert>
+
+    <select id="queryCount" parameterType="com.fh.ProductSearchParm.ProductSearchParm" resultType="long">
+        select count(*) from<include refid="TableName"></include> g left join goods_brand b on g.brand_id  = b.id
+        <include refid="sql_where"></include>
+    </select>
+
+    <select id="queryMapGoodsList" parameterType="com.fh.ProductSearchParm.ProductSearchParm" resultMap="rm">
+        select g.*,b.name "brand.name",
+        CONCAT(ifnull(r1.name,""),if(r2.name is null,'','-->'),ifnull(r2.name,""),if(r3.name is null,'','-->'),ifnull(r3.name,"")) "category"
+        from <include refid="TableName"></include> g
+        left join goods_brand b on g.brand_id = b.id
+        LEFT JOIN cxy_category r1 on g.category1 = r1.id
+        LEFT JOIN cxy_category r2 on g.category2 = r2.id
+        LEFT JOIN cxy_category r3 on g.category3 = r3.id
+        <include refid="sql_where"></include>
+        LIMIT #{start},#{length}
+    </select>
+
+    <select id="queryGoods" parameterType="com.fh.ProductSearchParm.ProductSearchParm" resultType="goods">
+        select g.*,b.name "brandName" from <include refid="TableName"></include> g
+        left join goods_brand b on g.brand_id = b.id
+        <include refid="sql_where"></include>
+    </select>
+
+    <resultMap id="rm" type="map">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="price" column="price"/>
+        <result property="time" column="time"/>
+        <result property="aaa" column="brandName"/>
+        <result property="category" column="category"/>
+        <result property="filePath" column="filePath"/>
+    </resultMap>
+
+    <!-- 添加 -->
+    <insert id="addGoods" parameterType="goods" >
+
+        insert into  <include refid="TableName"></include>
+        (name,price,time,brand_id,filePath,category1,category2,category3,status,subTotalCount)
+        values (#{name},#{price},#{time},#{brand_id},#{filePath},#{category1},#{category2},#{category3},#{status},#{subTotalCount})
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="deleteGoods" parameterType="Integer">
+        delete from <include refid="TableName"></include> where id = #{id}
+
+    </delete>
+    <!-- 批量删除 -->
+    <delete id="deleteBatch" parameterType="list">
+        delete from <include refid="TableName"></include> where id in
+        <foreach collection="list"  open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+
+    </delete>
+
+    <!-- 回显 -->
+    <select id="getGoodsById" resultType="goods">
+        select *  from <include refid="TableName"></include>  where id = #{id}
+    </select>
+
+    <!--修改-->
+    <update id="updateGoods" parameterType="goods">
+        update <include refid="TableName"></include> set
+        name=#{name},
+        price=#{price},
+        time=#{time},
+        brand_id=#{brand_id},
+        status=#{status},
+        subTotalCount=#{subTotalCount},
+        filePath = #{filePath},
+        graedTime = #{graedTime}
+        where id=#{id}
+
+    </update>
+    <!--修改下架-->
+    <update id="updateStatusDown" parameterType="goods">
+        update <include refid="TableName"></include> set
+        status=#{status}
+        where id=#{id}
+
+    </update>
+
+
+
+
+</mapper>

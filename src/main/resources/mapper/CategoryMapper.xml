@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+		"-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fh.mapper.CategoryMapper">
+	<cache  eviction="LRU" flushInterval="6000" size="512" readOnly="true"/>
+
+
+	<!-- 分类数据查询 -->
+	<select id="queryCategory"  parameterType="Integer" resultType="category">
+		select * from cxy_category where pid = #{pid}
+	</select>
+
+	<!-- 商品分类数据查询 -->
+	<select id="queryCoregoryList"  resultType="category">
+		select * from cxy_category
+	</select>
+
+
+
+</mapper>
