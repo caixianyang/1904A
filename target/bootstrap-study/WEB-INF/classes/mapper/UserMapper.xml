@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+		"-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fh.mapper.UserMapper">
+	<cache  eviction="LRU" flushInterval="6000" size="512" readOnly="true"/>
+
+	<sql id="TableName">
+		cxy_user
+	</sql>
+
+    <sql id="sql_where">
+        <where>
+            <if test="name != '' and name != null">
+                and g.name like concat('%',#{name},'%')
+            </if>
+            <if test="minTime!=null">
+                and g.cteateDate &gt;=#{minTime}
+            </if>
+            <if test="maxTime!=null">
+                and g.cteateDate &lt;=#{maxTime}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryCount" parameterType="com.fh.ProductSearchParm.ProductSearchParm" resultType="long">
+        select count(*) from<include refid="TableName"></include> g
+        <include refid="sql_where"></include>
+    </select>
+
+    <select id="queryMapUserList" parameterType="com.fh.ProductSearchParm.ProductSearchParm" resultMap="rm">
+        select g.*,
+        CONCAT(ifnull(r1.name,""),if(r2.name is null,'','-->'),ifnull(r2.name,""),if(r3.name is null,'','-->'),ifnull(r3.name,""),if(r4.name is null,'','-->'),ifnull(r4.name,"")) "area"
+        from<include refid="TableName"></include> g
+        LEFT JOIN city r1 on g.area1 = r1.id
+        LEFT JOIN city r2 on g.area2 = r2.id
+        LEFT JOIN city r3 on g.area3 = r3.id
+        LEFT JOIN city r4 on g.area4 = r4.id
+       <include refid="sql_where"></include>
+        LIMIT #{start},#{length}
+    </select>
+
+    <resultMap id="rm" type="map">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="propName" column="propName"/>
+        <result property="userImgUrl" column="userImgUrl"/>
+        <result property="pwd" column="pwd"/>
+        <result property="aufladen" column="aufladen"/>
+        <result property="remaining" column="remaining"/>
+        <result property="cteateDate" column="cteateDate"/>
+    </resultMap>
+
+    <!-- 注册添加 -->
+   <insert id="addUser" parameterType="user" >
+
+        insert into  <include refid="TableName"></include>
+        (name,pwd,cteateDate,salt)
+        values (#{name},#{pwd},#{cteateDate},#{salt})
+    </insert>
+    <!-- 添加 -->
+   <insert id="insertUser" parameterType="user" >
+        insert into  <include refid="TableName"></include>
+        (name,userImgUrl,pwd,cteateDate,salt,area1,area2,area3,area4,realUserName,sex,age,phone,email,salary,role)
+        values (#{name},#{userImgUrl},#{pwd},#{cteateDate},#{salt},#{area1},#{area2},#{area3},#{area4},#{realUserName},#{sex},#{age},#{phone},#{email},#{salary},#{role})
+    </insert>
+    <!--修改-->
+    <update id="updateUser" parameterType="user">
+        update <include refid="TableName"></include> set
+        name=#{name},
+        userImgUrl=#{userImgUrl},
+        pwd=#{pwd},
+        salt=#{salt},
+        area1=#{area1},
+        area2=#{area2},
+        area3=#{area3},
+        area4=#{area4},
+        realUserName=#{realUserName},
+        sex=#{sex},
+        age=#{age},
+        phone=#{phone},
+        email=#{email},
+        salary=#{salary},
+        cteateDate=#{cteateDate}
+        where id=#{id}
+
+    </update>
+
+    <!-- 删除 -->
+   <delete id="deleteUser" parameterType="Integer">
+        delete from <include refid="TableName"></include> where id = #{id}
+
+    </delete>
+
+    <!-- 回显 -->
+    <select id="getUserById" resultType="user">
+        select *  from <include refid="TableName"></include>  where id = #{id}
+    </select>
+    <!-- 回显name -->
+    <select id="getUserByName" resultType="user">
+        select *  from <include refid="TableName"></include>  where name = #{name}
+    </select>
+
+
+
+
+    <!-- 批量删除 -->
+    <delete id="deleteBatch" parameterType="list">
+
+        delete from <include refid="TableName"></include> where id in
+        <foreach collection="list"  open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+
+    </delete>
+
+
+</mapper>

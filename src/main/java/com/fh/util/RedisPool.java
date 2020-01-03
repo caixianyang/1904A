@@ -13,7 +13,7 @@ public class RedisPool {
         jedisPoolConfig.setMaxIdle(100);      //最大空闲连接数，默认8个
         jedisPoolConfig.setTestOnReturn(true);//在获取连接的时候检查有效性, 默认false
         jedisPoolConfig.setTestOnBorrow(true);//在空闲时检查有效性, 默认false
-        jedisPool = new JedisPool(jedisPoolConfig, "192.168.184.132", 6379);
+        jedisPool = new JedisPool(jedisPoolConfig, "192.168.184.133", 6379);
 
     }
     static{

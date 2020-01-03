@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+		"-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fh.mapper.ResourceMapper">
+	<cache  eviction="LRU" flushInterval="6000" size="512" readOnly="true"/>
+
+    <select id="getCurrentResourceAndUser" resultType="resource" parameterType="int" >
+		SELECT r.* FROM cxy_resource r
+      LEFT JOIN cxy_roleandresource rr ON r.id = rr.resourceId
+      LEFT JOIN cxy_roleanduser ur on  rr.roleId = ur.roleId
+      where ur.userId =#{id}
+	</select>
+
+
+
+</mapper>

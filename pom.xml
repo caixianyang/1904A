@@ -400,9 +400,6 @@
       <properties>
         <project.env>prod</project.env>
       </properties>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
     </profile>
   </profiles>
 
@@ -415,7 +412,7 @@
           <exclude>dev/*</exclude>
           <exclude>prod/*</exclude>
           <exclude>test/*</exclude>
-          <exclude>datasource.properties</exclude>
+
         </excludes>
       </resource>
       <resource>

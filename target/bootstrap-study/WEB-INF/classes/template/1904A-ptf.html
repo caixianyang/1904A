@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body{
+            font-family: SimSun-ttc;
+
+        }
+    </style>
+
+</head>
+<body>
+<h1> 1904A飞狐商店 </h1>
+<table border="1px">
+    <tr>
+        <td>商品名称</td>
+        <td>商品价格</td>
+        <td>商品品牌</td>
+    </tr>
+    <#list list as goods>
+    <tr>
+        <td>${goods.name}</td>
+        <td>${goods.price}</td>
+        <td>${goods.brandName}</td>
+    </tr>
+</#list>
+</table>
+</body>
+</html>
