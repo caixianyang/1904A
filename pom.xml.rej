@@ -1,0 +1,10 @@
+diff a/pom.xml b/pom.xml	(rejected hunks)
+@@ -390,7 +390,7 @@
+       </properties>
+     </profile>
+     <profile>
+-      <id>test</id>
++      <id>aaa</id>
+       <properties>
+         <project.env>test</project.env>
+       </properties>
